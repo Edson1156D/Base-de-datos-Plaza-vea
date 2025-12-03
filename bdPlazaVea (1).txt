@@ -1,0 +1,309 @@
+----------------------------------------------------------
+-- CREAR BASE DE DATOS
+----------------------------------------------------------
+
+DROP DATABASE IF EXISTS AlmacenDB;
+GO
+
+CREATE DATABASE AlmacenDB;
+GO
+
+USE AlmacenDB;
+GO
+
+
+----------------------------------------------------------
+-- TABLAS
+----------------------------------------------------------
+
+-- USUARIO (para login)
+CREATE TABLE Usuario (
+    idUsuario INT IDENTITY PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    passwordHash VARCHAR(255) NOT NULL,
+    rol VARCHAR(20) NOT NULL DEFAULT 'empleado'
+);
+GO
+
+
+-- TIPOS DE PRODUCTO
+CREATE TABLE TipoProducto (
+    idTipo INT IDENTITY PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    descripcion VARCHAR(200)
+);
+GO
+
+
+-- PROVEEDOR
+CREATE TABLE Proveedor (
+    idProveedor INT IDENTITY PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    ruc VARCHAR(11) UNIQUE,
+    telefono VARCHAR(20),
+    direccion VARCHAR(150)
+);
+GO
+
+
+-- PROVEEDOR + TIPO (relación N:N)
+CREATE TABLE ProveedorProductoTipo (
+    idProveedor INT NOT NULL,
+    idTipo INT NOT NULL,
+
+    CONSTRAINT PK_ProvTipo PRIMARY KEY (idProveedor, idTipo),
+
+    FOREIGN KEY (idProveedor) REFERENCES Proveedor(idProveedor),
+    FOREIGN KEY (idTipo) REFERENCES TipoProducto(idTipo)
+);
+GO
+
+
+-- PRODUCTO (incluye fecha de caducidad)
+CREATE TABLE Producto (
+    idProducto INT IDENTITY PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(200),
+    idTipo INT NOT NULL,
+    stock INT DEFAULT 0,
+    precio DECIMAL(10,2),
+    fechaCaducidad DATE,  -- NUEVO CAMPO
+
+    FOREIGN KEY (idTipo) REFERENCES TipoProducto(idTipo)
+);
+GO
+
+
+-- ENTRADA DE PRODUCTOS
+CREATE TABLE Entrada (
+    idEntrada INT IDENTITY PRIMARY KEY,
+    idProducto INT NOT NULL,
+    idProveedor INT NOT NULL,
+    cantidad INT NOT NULL,
+    fecha DATETIME DEFAULT GETDATE(),
+
+    FOREIGN KEY (idProducto) REFERENCES Producto(idProducto),
+    FOREIGN KEY (idProveedor) REFERENCES Proveedor(idProveedor)
+);
+GO
+
+
+-- SALIDA DE PRODUCTOS
+CREATE TABLE Salida (
+    idSalida INT IDENTITY PRIMARY KEY,
+    idProducto INT NOT NULL,
+    cantidad INT NOT NULL,
+    fecha DATETIME DEFAULT GETDATE(),
+
+    FOREIGN KEY (idProducto) REFERENCES Producto(idProducto)
+);
+GO
+
+
+----------------------------------------------------------
+-- PROCEDIMIENTOS – PRODUCTO
+----------------------------------------------------------
+
+-- Registrar producto con fecha de caducidad
+CREATE PROCEDURE sp_registrarProducto
+    @nombre VARCHAR(100),
+    @descripcion VARCHAR(200),
+    @idTipo INT,
+    @precio DECIMAL(10,2),
+    @fechaCaducidad DATE
+AS
+BEGIN
+    INSERT INTO Producto (nombre, descripcion, idTipo, precio, fechaCaducidad)
+    VALUES (@nombre, @descripcion, @idTipo, @precio, @fechaCaducidad);
+END;
+GO
+
+
+-- Listar todos los productos
+CREATE PROCEDURE sp_listarProductos
+AS
+BEGIN
+    SELECT 
+        p.idProducto, p.nombre, p.descripcion, 
+        t.nombre AS tipo, p.stock, p.precio, p.fechaCaducidad
+    FROM Producto p
+    JOIN TipoProducto t ON p.idTipo = t.idTipo;
+END;
+GO
+
+
+-- Filtrar por tipo
+CREATE PROCEDURE sp_filtrarProductosPorTipo
+    @idTipo INT
+AS
+BEGIN
+    SELECT 
+        idProducto, nombre, descripcion, stock, precio, fechaCaducidad
+    FROM Producto
+    WHERE idTipo = @idTipo;
+END;
+GO
+
+
+----------------------------------------------------------
+-- PROCEDIMIENTOS – PROVEEDOR
+----------------------------------------------------------
+
+CREATE PROCEDURE sp_registrarProveedor
+    @nombre VARCHAR(100),
+    @ruc VARCHAR(11),
+    @telefono VARCHAR(20),
+    @direccion VARCHAR(150)
+AS
+BEGIN
+    INSERT INTO Proveedor (nombre, ruc, telefono, direccion)
+    VALUES (@nombre, @ruc, @telefono, @direccion);
+END;
+GO
+
+
+CREATE PROCEDURE sp_listarProveedores
+AS
+BEGIN
+    SELECT * FROM Proveedor;
+END;
+GO
+
+
+CREATE PROCEDURE sp_asignarProveedorTipo
+    @idProveedor INT,
+    @idTipo INT
+AS
+BEGIN
+    INSERT INTO ProveedorProductoTipo (idProveedor, idTipo)
+    VALUES (@idProveedor, @idTipo);
+END;
+GO
+
+
+CREATE PROCEDURE sp_filtrarProveedoresPorTipo
+    @idTipo INT
+AS
+BEGIN
+    SELECT p.idProveedor, p.nombre, p.ruc, p.telefono, p.direccion
+    FROM Proveedor p
+    JOIN ProveedorProductoTipo pt 
+        ON p.idProveedor = pt.idProveedor
+    WHERE pt.idTipo = @idTipo;
+END;
+GO
+
+
+----------------------------------------------------------
+-- PROCEDIMIENTOS – ENTRADAS
+----------------------------------------------------------
+
+CREATE PROCEDURE sp_registrarEntrada
+    @idProducto INT,
+    @idProveedor INT,
+    @cantidad INT
+AS
+BEGIN
+    INSERT INTO Entrada (idProducto, idProveedor, cantidad)
+    VALUES (@idProducto, @idProveedor, @cantidad);
+
+    UPDATE Producto
+    SET stock = stock + @cantidad
+    WHERE idProducto = @idProducto;
+END;
+GO
+
+
+CREATE PROCEDURE sp_listarEntradas
+AS
+BEGIN
+    SELECT 
+        e.idEntrada, p.nombre AS producto, pr.nombre AS proveedor,
+        e.cantidad, e.fecha
+    FROM Entrada e
+    JOIN Producto p ON e.idProducto = p.idProducto
+    JOIN Proveedor pr ON e.idProveedor = pr.idProveedor;
+END;
+GO
+
+
+----------------------------------------------------------
+-- PROCEDIMIENTOS – SALIDAS
+----------------------------------------------------------
+
+CREATE PROCEDURE sp_registrarSalida
+    @idProducto INT,
+    @cantidad INT
+AS
+BEGIN
+    UPDATE Producto
+    SET stock = stock - @cantidad
+    WHERE idProducto = @idProducto;
+
+    INSERT INTO Salida (idProducto, cantidad)
+    VALUES (@idProducto, @cantidad);
+END;
+GO
+
+
+CREATE PROCEDURE sp_listarSalidas
+AS
+BEGIN
+    SELECT 
+        s.idSalida, p.nombre AS producto, s.cantidad, s.fecha
+    FROM Salida s
+    JOIN Producto p ON s.idProducto = p.idProducto;
+END;
+GO
+
+
+----------------------------------------------------------
+-- PROCEDIMIENTO – KARDEX
+----------------------------------------------------------
+
+CREATE PROCEDURE sp_reporteKardex
+    @idProducto INT
+AS
+BEGIN
+    SELECT 'ENTRADA' AS Movimiento, cantidad, fecha
+    FROM Entrada
+    WHERE idProducto = @idProducto
+
+    UNION ALL
+
+    SELECT 'SALIDA', cantidad, fecha
+    FROM Salida
+    WHERE idProducto = @idProducto
+
+    ORDER BY fecha;
+END;
+GO
+
+
+----------------------------------------------------------
+-- PROCEDIMIENTOS – LOGIN
+----------------------------------------------------------
+
+-- Registrar usuario (passwordHash ya viene encriptado)
+CREATE PROCEDURE sp_registrarUsuario
+    @username VARCHAR(50),
+    @passwordHash VARCHAR(255),
+    @rol VARCHAR(20)
+AS
+BEGIN
+    INSERT INTO Usuario (username, passwordHash, rol)
+    VALUES (@username, @passwordHash, @rol);
+END;
+GO
+
+-- Validar login
+CREATE PROCEDURE sp_login
+    @username VARCHAR(50)
+AS
+BEGIN
+    SELECT idUsuario, username, passwordHash, rol
+    FROM Usuario
+    WHERE username = @username;
+END;
+GO
+
