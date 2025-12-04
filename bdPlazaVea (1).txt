@@ -96,7 +96,8 @@ CREATE TABLE Producto (
     FOREIGN KEY (idTipo) REFERENCES TipoProducto(idTipo)
 );
 GO
-
+ALTER TABLE dbo.Producto
+ADD id_proveedor
 
 -- ENTRADA DE PRODUCTOS
 CREATE TABLE Entrada (
@@ -330,5 +331,6 @@ BEGIN
     WHERE username = @username;
 END;
 GO
+
 
 
