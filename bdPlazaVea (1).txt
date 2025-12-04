@@ -11,6 +11,30 @@ GO
 USE AlmacenDB;
 GO
 
+----------------------------------------------------------
+-- Modificar tabla usuarios
+-- -------------------------------------------------
+IF OBJECT_ID('dbo.usuario', 'U') IS NOT NULL
+    DROP TABLE dbo.usuario;
+GO
+
+CREATE TABLE dbo.usuario (
+    id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,	
+    password_hash VARCHAR(64) NOT NULL,
+    rol VARCHAR(20)
+);
+GO
+
+-- Crear usuario admin
+INSERT INTO usuario (username, password_hash, rol)
+VALUES (
+    'admin',
+    CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 'admin123'), 2),
+    'ADMIN'
+);
+GO
+
 
 ----------------------------------------------------------
 -- TABLAS
@@ -306,4 +330,5 @@ BEGIN
     WHERE username = @username;
 END;
 GO
+
 
