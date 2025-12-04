@@ -305,6 +305,75 @@ END;
 GO
 
 
+
+-- Modificar tabla usuarios
+-- -------------------------------------------------
+IF OBJECT_ID('dbo.usuario', 'U') IS NOT NULL
+    DROP TABLE dbo.usuario;
+GO
+
+CREATE TABLE dbo.usuario (
+    id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,	
+    password_hash VARCHAR(64) NOT NULL,
+    rol VARCHAR(20)
+);
+GO
+
+-- Crear usuario admin
+INSERT INTO usuario (username, password_hash, rol)
+VALUES (
+    'admin',
+    CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 'admin123'), 2),
+    'ADMIN'
+);
+GO
+
+
+
+
+IF EXISTS (SELECT 1 FROM sys.objects 
+           WHERE type = 'P' AND name = 'sp_buscar_usuario_por_username')
+    DROP PROCEDURE sp_buscar_usuario_por_username;
+GO
+
+CREATE PROCEDURE sp_buscar_usuario_por_username
+    @p_username VARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM usuario
+    WHERE username = @p_username;
+END;
+GO
+
+
+ALTER TABLE usuario 
+ADD nombre VARCHAR(100),
+    email VARCHAR(100);
+
+ALTER TABLE usuario
+ADD estado VARCHAR(10) 
+        CONSTRAINT chk_estado_usuario 
+        CHECK (estado IN ('ACTIVO', 'INACTIVO'))
+        DEFAULT 'ACTIVO';
+GO
+
+SELECT 
+    username,
+    password_hash
+FROM usuario
+WHERE username = 'admin';
+
+
+
+
+
+
+
+
 ----------------------------------------------------------
 -- PROCEDIMIENTOS – LOGIN
 ----------------------------------------------------------
@@ -331,6 +400,7 @@ BEGIN
     WHERE username = @username;
 END;
 GO
+
 
 
 
