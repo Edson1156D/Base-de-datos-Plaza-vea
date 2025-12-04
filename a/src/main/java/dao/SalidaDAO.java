@@ -3,13 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dao;
-
-import java.util.List;
 import modelo.Salida;
+import java.util.List;
 
 public interface SalidaDAO {
-
-    boolean registrarSalida(Salida salida);
-
-    List<Salida> listarSalidas();
+    boolean registrar(Salida salida);
+    List<Salida> listar();
 }
+

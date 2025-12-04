@@ -3,19 +3,133 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vista;
-
+import dao.EntradaDAO;
+import dao_impl.EntradaDAOImpl;
+import modelo.Entrada;
+import modelo.Conexion;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
+import javax.swing.JFileChooser;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.awt.Color;
 /**
  *
  * @author LAB-USR-LNORTE
  */
 public class RegistrarEForm extends javax.swing.JFrame {
 
+    private EntradaDAO entradaDao;
+    private DefaultTableModel modeloTabla;
+
+    // Arreglos para guardar los IDs de productos y proveedores
+    private int[] idsProductos;
+    private int[] idsProveedores;
+
+    public RegistrarEForm() { 
+        initComponents();
+        
+        getContentPane().setBackground(new Color(215, 25, 32));
+        
+
+        // Inicializar DAO con try-catch
+        try {
+            entradaDao = new EntradaDAOImpl();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al inicializar DAO: " + e.getMessage());
+        }
+
+        // Configurar tabla
+        modeloTabla = new DefaultTableModel();
+        modeloTabla.addColumn("ID Entrada");
+        modeloTabla.addColumn("Producto");
+        modeloTabla.addColumn("Proveedor");
+        modeloTabla.addColumn("Cantidad");
+        modeloTabla.addColumn("Fecha");
+        TablaEntradas.setModel(modeloTabla);
+
+        // Cargar datos
+        listarEntradas();
+        cargarCombos();
+    }
+    private void cargarCombos() {
+        try {
+            // Productos
+            ResultSet rsProd = Conexion.obtenerConexion().createStatement()
+                    .executeQuery("SELECT idProducto, nombre FROM producto");
+            ArrayList<String> nombresProd = new ArrayList<>();
+            ArrayList<Integer> idProd = new ArrayList<>();
+            while (rsProd.next()) {
+                nombresProd.add(rsProd.getString("nombre"));
+                idProd.add(rsProd.getInt("idProducto"));
+            }
+            idsProductos = idProd.stream().mapToInt(i -> i).toArray();
+            ComboProductos.setModel(new javax.swing.DefaultComboBoxModel<>(nombresProd.toArray(new String[0])));
+
+            // Proveedores
+            ResultSet rsProv = Conexion.obtenerConexion().createStatement()
+                    .executeQuery("SELECT idProveedor, nombre FROM proveedor");
+            ArrayList<String> nombresProv = new ArrayList<>();
+            ArrayList<Integer> idProv = new ArrayList<>();
+            while (rsProv.next()) {
+                nombresProv.add(rsProv.getString("nombre"));
+                idProv.add(rsProv.getInt("idProveedor"));
+            }
+            idsProveedores = idProv.stream().mapToInt(i -> i).toArray();
+            ComboProovedores.setModel(new javax.swing.DefaultComboBoxModel<>(nombresProv.toArray(new String[0])));
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar combos: " + e.getMessage());
+        }
+    }
+    private void listarEntradas() {
+        modeloTabla.setRowCount(0); // limpiar tabla
+        for (Entrada e : entradaDao.listar()) {
+            String producto = obtenerNombreProducto(e.getIdProducto());
+            String proveedor = obtenerNombreProveedor(e.getIdProveedor());
+            modeloTabla.addRow(new Object[]{
+                e.getIdEntrada(),
+                producto,
+                proveedor,
+                e.getCantidad(),
+                e.getFecha()
+            });
+        }
+    }
+    private String obtenerNombreProducto(int id) {
+        try {
+            ResultSet rs = Conexion.obtenerConexion().createStatement()
+                    .executeQuery("SELECT nombre FROM producto WHERE idProducto = " + id);
+            if (rs.next()) return rs.getString("nombre");
+        } catch (Exception e) {}
+        return "";
+    }
+     private String obtenerNombreProveedor(int id) {
+        try {
+            ResultSet rs = Conexion.obtenerConexion().createStatement()
+                    .executeQuery("SELECT nombre FROM proveedor WHERE idProveedor = " + id);
+            if (rs.next()) return rs.getString("nombre");
+        } catch (Exception e) {}
+        return "";
+    }
+     private void limpiarCampos() {
+        ComboProductos.setSelectedIndex(0);
+        ComboProovedores.setSelectedIndex(0);
+        CantidadEntradas.setText("");
+    }
+
+
     /**
      * Creates new form RegistrarEForm
      */
-    public RegistrarEForm() {
-        initComponents();
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -40,7 +154,6 @@ public class RegistrarEForm extends javax.swing.JFrame {
         CantidadEntradas = new javax.swing.JTextField();
         btnRegistrarEntrada = new javax.swing.JButton();
         btnRegistrarEntrada1 = new javax.swing.JButton();
-        btnListarEntradas = new javax.swing.JButton();
         btnImprimirEntradas = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -58,16 +171,31 @@ public class RegistrarEForm extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Sitka Text", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Modulo de gestion de Entradas de Productos");
 
         ComboProductos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboProductos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboProductosActionPerformed(evt);
+            }
+        });
 
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Producto:");
 
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Proovedor :");
 
         ComboProovedores.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboProovedores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboProovedoresActionPerformed(evt);
+            }
+        });
 
         TablaEntradas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -82,80 +210,195 @@ public class RegistrarEForm extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(TablaEntradas);
 
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Cantidad: ");
 
+        CantidadEntradas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CantidadEntradasActionPerformed(evt);
+            }
+        });
+
+        btnRegistrarEntrada.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnRegistrarEntrada.setText("Registrar Entrada");
+        btnRegistrarEntrada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarEntradaActionPerformed(evt);
+            }
+        });
 
+        btnRegistrarEntrada1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnRegistrarEntrada1.setText("Limpiar");
+        btnRegistrarEntrada1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarEntrada1ActionPerformed(evt);
+            }
+        });
 
-        btnListarEntradas.setText("Listar Entradas");
-
+        btnImprimirEntradas.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnImprimirEntradas.setText("Imprimir");
+        btnImprimirEntradas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImprimirEntradasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(108, 108, 108))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(94, 94, 94)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(25, 25, 25)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 593, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(363, 363, 363)
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(ComboProovedores, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(ComboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel1)
+                        .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnRegistrarEntrada))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnRegistrarEntrada1, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnListarEntradas)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnImprimirEntradas))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(CantidadEntradas, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(64, 64, 64)
+                            .addComponent(btnRegistrarEntrada)
+                            .addGap(41, 41, 41)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(ComboProductos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(ComboProovedores, 0, 126, Short.MAX_VALUE)
-                                .addComponent(CantidadEntradas))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 593, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(32, Short.MAX_VALUE))
+                                .addComponent(btnImprimirEntradas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRegistrarEntrada1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)))))
+                .addContainerGap(88, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
+                .addGap(31, 31, 31)
                 .addComponent(jLabel1)
-                .addGap(44, 44, 44)
+                .addGap(43, 43, 43)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ComboProductos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
                     .addComponent(jLabel5)
                     .addComponent(ComboProovedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(49, 49, 49)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CantidadEntradas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
-                    .addComponent(CantidadEntradas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRegistrarEntrada)
-                    .addComponent(btnRegistrarEntrada1)
-                    .addComponent(btnListarEntradas)
-                    .addComponent(btnImprimirEntradas))
-                .addGap(54, 54, 54)
+                    .addComponent(btnRegistrarEntrada1))
+                .addGap(18, 18, 18)
+                .addComponent(btnImprimirEntradas)
+                .addGap(26, 26, 26)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 409, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(83, Short.MAX_VALUE))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnRegistrarEntradaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarEntradaActionPerformed
+        // TODO add your handling code here:
+                try {
+            int idProducto = idsProductos[ComboProductos.getSelectedIndex()];
+            int idProveedor = idsProveedores[ComboProovedores.getSelectedIndex()];
+            int cantidad = Integer.parseInt(CantidadEntradas.getText());
+            Date fecha = Date.valueOf(LocalDate.now());
+
+            Entrada entrada = new Entrada();
+            entrada.setIdProducto(idProducto);
+            entrada.setIdProveedor(idProveedor);
+            entrada.setCantidad(cantidad);
+            entrada.setFecha(fecha);
+
+            if (entradaDao.registrar(entrada)) {
+                JOptionPane.showMessageDialog(this, "Entrada registrada correctamente");
+                listarEntradas();
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al registrar la entrada");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Ingrese un número válido en cantidad");
+        }
+                
+    }//GEN-LAST:event_btnRegistrarEntradaActionPerformed
+
+    private void btnRegistrarEntrada1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarEntrada1ActionPerformed
+        // TODO add your handling code here:
+        limpiarCampos();
+    }//GEN-LAST:event_btnRegistrarEntrada1ActionPerformed
+
+    private void btnImprimirEntradasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirEntradasActionPerformed
+        // TODO add your handling code here:
+         exportarExcel(TablaEntradas); // <-- tu tabla actual
+}
+
+// Método para exportar Excel
+public void exportarExcel(JTable tabla) {
+    try {
+        JFileChooser selector = new JFileChooser();
+        selector.setDialogTitle("Guardar como Excel");
+        if (selector.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File archivo = selector.getSelectedFile();
+            String ruta = archivo.getAbsolutePath();
+            if (!ruta.endsWith(".xlsx")) {
+                ruta += ".xlsx";
+            }
+
+            Workbook libro = new XSSFWorkbook();
+            Sheet hoja = libro.createSheet("Reporte");
+            TableModel modelo = tabla.getModel();
+
+            // Encabezados
+            Row filaEncabezados = hoja.createRow(0);
+            for (int i = 0; i < modelo.getColumnCount(); i++) {
+                Cell celda = filaEncabezados.createCell(i);
+                celda.setCellValue(modelo.getColumnName(i));
+            }
+
+            // Datos
+            for (int i = 0; i < modelo.getRowCount(); i++) {
+                Row filaDatos = hoja.createRow(i + 1);
+                for (int j = 0; j < modelo.getColumnCount(); j++) {
+                    Object valor = modelo.getValueAt(i, j);
+                    Cell celda = filaDatos.createCell(j);
+                    if (valor != null) celda.setCellValue(valor.toString());
+                }
+            }
+
+            FileOutputStream salida = new FileOutputStream(ruta);
+            libro.write(salida);
+            libro.close();
+            salida.close();
+
+            JOptionPane.showMessageDialog(null, "¡Exportado exitosamente!");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al exportar: " + e.getMessage());
+    }
+
+    }//GEN-LAST:event_btnImprimirEntradasActionPerformed
+
+    private void CantidadEntradasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CantidadEntradasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CantidadEntradasActionPerformed
+
+    private void ComboProovedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboProovedoresActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboProovedoresActionPerformed
+
+    private void ComboProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboProductosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboProductosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -199,7 +442,6 @@ public class RegistrarEForm extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> ComboProovedores;
     private javax.swing.JTable TablaEntradas;
     private javax.swing.JButton btnImprimirEntradas;
-    private javax.swing.JButton btnListarEntradas;
     private javax.swing.JButton btnRegistrarEntrada;
     private javax.swing.JButton btnRegistrarEntrada1;
     private javax.swing.JLabel jLabel1;

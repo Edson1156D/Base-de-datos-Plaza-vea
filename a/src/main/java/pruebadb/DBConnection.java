@@ -10,7 +10,7 @@ public class DBConnection {
     private static DBConnection instance;
     private Connection connection;
 
-    private final String URL = "jdbc:sqlserver://DESKTOP-G6B8HIA\\KEVIN:1433;databaseName=AlmacenDB;encrypt=false;";
+    private final String URL = "jdbc:sqlserver://localhost:1433;databaseName=AlmacenDB;encrypt=false;trustServerCertificate=true;";
     private final String USER = "sa";
     private final String PASSWORD = "1234";
 

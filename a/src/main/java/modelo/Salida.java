@@ -1,24 +1,15 @@
 package modelo;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class Salida {
-
     private int idSalida;
     private int idProducto;
+    private int idProveedor;
     private int cantidad;
     private Date fecha;
 
-    public Salida() {
-    }
-
-    public Salida(int idSalida, int idProducto, int cantidad, Date fecha) {
-        this.idSalida = idSalida;
-        this.idProducto = idProducto;
-        this.cantidad = cantidad;
-        this.fecha = fecha;
-    }
-
+    // Getters y Setters
     public int getIdSalida() {
         return idSalida;
     }
@@ -33,6 +24,14 @@ public class Salida {
 
     public void setIdProducto(int idProducto) {
         this.idProducto = idProducto;
+    }
+
+    public int getIdProveedor() {
+        return idProveedor;
+    }
+
+    public void setIdProveedor(int idProveedor) {
+        this.idProveedor = idProveedor;
     }
 
     public int getCantidad() {
