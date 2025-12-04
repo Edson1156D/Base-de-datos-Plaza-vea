@@ -1,19 +1,30 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 
 import java.util.List;
 import modelo.Proveedor;
+import modelo.TipoProducto;
 
 public interface ProveedorDAO {
 
-    boolean registrarProveedor(Proveedor proveedor);
+    boolean registrarProveedor(Proveedor p);
+
+    boolean actualizarProveedor(Proveedor p);
+
+    boolean eliminarProveedor(int idProveedor);
+
+    Proveedor buscarPorId(int idProveedor);
 
     List<Proveedor> listarProveedores();
 
-    boolean asignarTipo(int idProveedor, int idTipo);
+    List<Proveedor> buscarPorNombre(String nombre);
+
+    boolean asignarTipoAProveedor(int idProveedor, int idTipo);
+
+    boolean eliminarTipoDeProveedor(int idProveedor, int idTipo);
+
+    List<TipoProducto> listarTiposDeProveedor(int idProveedor);
 
     List<Proveedor> filtrarPorTipo(int idTipo);
+    
+    Proveedor buscarPorID(int id);
 }
