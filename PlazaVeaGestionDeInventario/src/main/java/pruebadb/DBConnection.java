@@ -9,23 +9,13 @@ public class DBConnection {
     private static DBConnection instance;
     private Connection connection;
 
-    private final String URL = "jdbc:sqlserver://DESKTOP-G6B8HIA\\KEVIN:1433;databaseName=AlmacenDB;encrypt=false;";
+    // ⚠️ CAMBIA "TuBD" por el nombre REAL de tu base de datos
+    private final String URL = "jdbc:sqlserver://localhost:1433;databaseName=AlmacenDB;encrypt=false;";
     private final String USER = "sa";
-    private final String PASSWORD = "1234"; // tu contraseña
+    private final String PASS = "1234";
 
     private DBConnection() {
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-
-        } catch (ClassNotFoundException e) {
-            System.out.println("No se encontró el driver de SQL Server.");
-            e.printStackTrace();
-
-        } catch (SQLException e) {
-            System.out.println("Error al conectar a SQL Server:");
-            e.printStackTrace();
-        }
+        conectar();
     }
 
     public static DBConnection getInstance() {
@@ -35,7 +25,26 @@ public class DBConnection {
         return instance;
     }
 
+    private void conectar() {
+        try {
+            connection = DriverManager.getConnection(URL, USER, PASS);
+            System.out.println("✔ Conectado correctamente a SQL Server.");
+        } catch (SQLException e) {
+            System.err.println("❌ Error al conectar: " + e.getMessage());
+            connection = null;
+        }
+    }
+
     public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                System.err.println("⚠ La conexión estaba cerrada, intentando reconectar...");
+                conectar();
+            }
+        } catch (SQLException e) {
+            System.err.println("⚠ Error detectando estado de conexión, reconectando...");
+            conectar();
+        }
         return connection;
     }
 }
