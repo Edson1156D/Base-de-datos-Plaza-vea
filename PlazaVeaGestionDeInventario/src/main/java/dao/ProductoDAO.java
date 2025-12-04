@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 
 import java.util.List;
@@ -13,7 +9,14 @@ public interface ProductoDAO {
 
     List<Producto> listarProductos();
 
-    List<Producto> filtrarPorTipo(int idTipo);
-
+    // --- AGREGA ESTAS DOS LÍNEAS NUEVAS ---
+    boolean actualizarProducto(Producto p);
+    boolean eliminarProducto(int idProducto);
+    // --------------------------------------
+List<Producto> buscarPorNombre(String nombre);  // Para btnBuscar
+    List<Producto> filtrarPorStock();               // Para F.Stock (Ordena por stock)
+    List<Producto> filtrarPorPrecio(double precio); // Para F.Precio (Menores al precio dado)
+    List<Producto> filtrarPorTipo(int idTipo);      // Para btnFiltrar
+   
     Producto buscarPorId(int idProducto);
 }
