@@ -4,15 +4,6 @@ public class TipoProducto {
 
     private int idTipo;
     private String nombre;
-    private String descripcion;
-
-    public TipoProducto() {}
-
-    public TipoProducto(int idTipo, String nombre, String descripcion) {
-        this.idTipo = idTipo;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-    }
 
     public int getIdTipo() {
         return idTipo;
@@ -29,13 +20,4 @@ public class TipoProducto {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
 }
-
