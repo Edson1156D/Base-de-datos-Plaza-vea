@@ -4,6 +4,7 @@
  */
 package vista;
 
+import javax.swing.JOptionPane;
 import modelo.Usuario;
 
 /**
@@ -16,12 +17,14 @@ public class MainForm extends javax.swing.JFrame {
      * Creates new form MainForm
      */
     private Usuario usuario;
+
     public MainForm() {
         initComponents();
+        setTitle("Sistema de Gestión de Almacen de Plaza Vea");
         pack();
         setLocationRelativeTo(null);
     }
-    
+
     public MainForm(Usuario usuario) {
         this.usuario = usuario;
         initComponents();
@@ -42,23 +45,29 @@ public class MainForm extends javax.swing.JFrame {
 
         jMenu1 = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
+        jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        btnAcerca = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jArchivo = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jProductos = new javax.swing.JMenu();
-        jProveedores = new javax.swing.JMenu();
-        jEntradas = new javax.swing.JMenu();
-        jSalidas = new javax.swing.JMenu();
-        jReportes = new javax.swing.JMenu();
+        jLabel3 = new javax.swing.JLabel();
 
         jMenu1.setText("jMenu1");
 
         jMenu4.setText("jMenu4");
 
+        jButton1.setText("jButton1");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -71,59 +80,194 @@ public class MainForm extends javax.swing.JFrame {
             .addGap(0, 694, Short.MAX_VALUE)
         );
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cortes.web01.jpg"))); // NOI18N
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1002, 6, -1, -1));
 
-        jArchivo.setText("Archivo");
+        jPanel2.setBackground(new java.awt.Color(204, 0, 0));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jMenuItem2.setText("Salir");
-        jArchivo.add(jMenuItem2);
+        jButton2.setBackground(new java.awt.Color(255, 204, 0));
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
+        jButton2.setText("Productos");
+        jButton2.setBorder(null);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 130, 190, 60));
 
-        jMenuBar1.add(jArchivo);
+        jButton3.setBackground(new java.awt.Color(255, 204, 0));
+        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton3.setForeground(new java.awt.Color(255, 255, 255));
+        jButton3.setText("Proveedores");
+        jButton3.setBorder(null);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 130, 200, 60));
 
-        jProductos.setText("Productos");
-        jMenuBar1.add(jProductos);
+        jButton4.setBackground(new java.awt.Color(255, 204, 0));
+        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton4.setForeground(new java.awt.Color(255, 255, 255));
+        jButton4.setText("Registrar Entradas");
+        jButton4.setBorder(null);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 130, 200, 60));
 
-        jProveedores.setText("Proveedores");
-        jMenuBar1.add(jProveedores);
+        jButton5.setBackground(new java.awt.Color(255, 204, 0));
+        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton5.setForeground(new java.awt.Color(255, 255, 255));
+        jButton5.setText("Registrar salidas");
+        jButton5.setBorder(null);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 130, 200, 60));
 
-        jEntradas.setText("Entradas");
-        jMenuBar1.add(jEntradas);
+        jButton6.setBackground(new java.awt.Color(255, 204, 0));
+        jButton6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton6.setForeground(new java.awt.Color(255, 255, 255));
+        jButton6.setText("Reportes");
+        jButton6.setBorder(null);
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 240, 200, 60));
 
-        jSalidas.setText("Salidas");
-        jMenuBar1.add(jSalidas);
+        jButton7.setBackground(new java.awt.Color(0, 153, 255));
+        jButton7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jButton7.setForeground(new java.awt.Color(0, 0, 0));
+        jButton7.setText("Cerrar sesión");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 700, 170, 40));
 
-        jReportes.setText("Reportes");
-        jMenuBar1.add(jReportes);
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cortes.web01.jpg"))); // NOI18N
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 350, 860, 280));
 
-        setJMenuBar(jMenuBar1);
+        btnAcerca.setBackground(new java.awt.Color(255, 204, 0));
+        btnAcerca.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnAcerca.setForeground(new java.awt.Color(0, 0, 0));
+        btnAcerca.setText("Acerca de..");
+        btnAcerca.setBorder(null);
+        btnAcerca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAcercaActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnAcerca, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 710, 140, 30));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jLabel2.setForeground(new java.awt.Color(204, 204, 204));
+        jLabel2.setText("© 2025 Sistema Plaza Vea Logística. Todos los derechos reservados. ");
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 730, -1, -1));
+
+        jLabel3.setFont(new java.awt.Font("Arial Black", 1, 36)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("MODULOS DISPONIBLES");
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 30, -1, -1));
+
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 760));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        ProductosForm f = new ProductosForm();
+        f.setVisible(true);
+        f.pack();
+        f.setLocationRelativeTo(null);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        ProovedoresForm f = new ProovedoresForm();
+        f.setVisible(true);
+        f.pack();
+        f.setLocationRelativeTo(null);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        RegistrarEForm f = new RegistrarEForm();
+        f.setVisible(true);
+        f.pack();
+        f.setLocationRelativeTo(null);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        RegistrarSForm f = new RegistrarSForm();
+        f.setVisible(true);
+        f.pack();
+        f.setLocationRelativeTo(null);
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        ReportesForm f = new ReportesForm();
+        f.setVisible(true);
+        f.pack();
+        f.setLocationRelativeTo(null);
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        int respuesta = javax.swing.JOptionPane.showConfirmDialog(
+                this,
+                "¿Seguro que deseas cerrar sesión?",
+                "Confirmación",
+                javax.swing.JOptionPane.YES_NO_OPTION
+        );
+
+        if (respuesta == javax.swing.JOptionPane.YES_OPTION) {
+            this.dispose(); // Cierra el MainForm
+
+            // Volver a mostrar LoginForm
+            LoginForm login = new LoginForm();
+            login.setLocationRelativeTo(null);
+            login.setVisible(true);
+        }
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void btnAcercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAcercaActionPerformed
+        String mensaje
+                = "💻 Sistema Gestión de Inventarios Plaza Vea\n"
+                + "Versión: 1.0.0\n"
+                + "Fecha: 2025\n\n"
+                + "Créditos\n"
+                + "Desarrolladores:\n"
+                + " - BRICEÑO ZEGARRA KEVIN\n"
+                + " - GONZALEZ DELGADO LEONARDO JESÚS\n"
+                + " - LOARTE ESPINOZA JOSEPH \n"
+                + " - PASIÓN ROQUE EDSON\n"
+                + " - SARMIENTO RIOS FABIAN\n"
+                + "Proyecto académico para el curso:\n"
+                + "Base de Datos II - UTP (2025)\n"
+                + "Docente: Marco Soto Martinez\n\n"
+                + "© Todos los derechos reservados.";
+        
+        JOptionPane.showMessageDialog(
+                this,
+                mensaje,
+                "Acerca del Sistema",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+  
+    }//GEN-LAST:event_btnAcercaActionPerformed
+
+/**
+ * @param args the command line arguments
+ */
+public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -134,16 +278,28 @@ public class MainForm extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-                }
+
+}
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+} catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(MainForm.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+} catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(MainForm.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(MainForm.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -156,17 +312,20 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu jArchivo;
-    private javax.swing.JMenu jEntradas;
+    private javax.swing.JButton btnAcerca;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JMenu jProductos;
-    private javax.swing.JMenu jProveedores;
-    private javax.swing.JMenu jReportes;
-    private javax.swing.JMenu jSalidas;
+    private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
 }
